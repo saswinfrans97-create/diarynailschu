@@ -599,7 +599,7 @@
 
 <div class="sticky-bar">
   <div class="total-info">
-    <span class="total-label">Total Estimasi</span>
+    <span class="total-label">Total </span>
     <span class="total-amount" id="totalAmount">Rp 0</span>
   </div>
   <button class="bill-btn" id="billBtn" type="button">Lihat Bill Pembelian 📄</button>
@@ -629,7 +629,7 @@
       <span id="billGrandTotal">Rp 0</span>
     </div>
 
-    <p class="bill-footer-note">Terima kasih sudah mampir, kak! 💕<br>Estimasi ini bisa berubah menyesuaikan kondisi di tempat.</p>
+    <p class="bill-footer-note">Terima kasih sudah mampir, kak! 💕<br> ini bisa berubah menyesuaikan kondisi di tempat.</p>
 
     <button class="close-bill-btn" id="closeBillBtn" type="button">Tutup Bill</button>
   </div>
@@ -850,9 +850,9 @@
 
     const message =
       `Halo Kak Admin Diary Nails Chu! 💕\n` +
-      `Ini estimasi Bookingan saya:\n` +
+      `Ini  Bookingan saya:\n` +
       `${lines.join("\n")}\n\n` +
-      `Estimasi Total: ${formatRupiah(total)}\n` +
+      ` Total: ${formatRupiah(total)}\n` +
       `Apakah ada slot kosong untuk saya? 🥰`;
 
     const url = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(message)}`;
