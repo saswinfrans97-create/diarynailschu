@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>DIARY.NAILS.CHU — Kalkulator & Booking</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --rose-gold:#C98A99;
+    --rose-gold-dark:#A96A79;
+    --blush:#FFE1EA;
+    --blush-light:#FFF3F6;
+    --cream:#FFFBFC;
+    --text-dark:#5B3A45;
+    --text-light:#A4818B;
+    --gold:#E3B583;
+    --pink-strong:#FF8FAE;
+    --shadow-soft:rgba(199,138,153,0.18);
+    --green-wa:#3BA66B;
+  }
+
+  *{box-sizing:border-box; margin:0; padding:0;}
+
+  body{
+    font-family:'Poppins', sans-serif;
+    background:
+      radial-gradient(circle at 15% 0%, #FFE7EE 0%, transparent 45%),
+      radial-gradient(circle at 90% 10%, #FFF0E8 0%, transparent 40%),
+      linear-gradient(180deg, #FFF6F8 0%, #FFEEF2 100%);
+    color:var(--text-dark);
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  .app{
+    max-width:480px;
+    margin:0 auto;
+    padding:24px 18px 140px;
+    position:relative;
+  }
+
+  /* ---------- HERO ---------- */
+  .hero{
+    text-align:center;
+    margin-bottom:22px;
+    position:relative;
+  }
+  .hero .deco{
+    position:absolute;
+    inset:-10px -10px auto -10px;
+    height:90px;
+    pointer-events:none;
+    overflow:hidden;
+  }
+  .sparkle{
+    position:absolute;
+    font-size:14px;
+    opacity:0.55;
+    animation:float 4.5s ease-in-out infinite;
+  }
+  .sparkle:nth-child(1){left:6%; top:6px; animation-delay:0s;}
+  .sparkle:nth-child(2){left:80%; top:0px; animation-delay:1.2s; font-size:11px;}
+  .sparkle:nth-child(3){left:48%; top:18px; animation-delay:2.1s; font-size:10px;}
+  @keyframes float{
+    0%,100%{transform:translateY(0) rotate(0deg);}
+    50%{transform:translateY(-8px) rotate(12deg);}
+  }
+
+  .logo-badge{
+    width:64px; height:64px;
+    margin:0 auto 10px;
+    border-radius:50%;
+    background:linear-gradient(145deg, #FFC4D6, #F4A8B9);
+    display:flex; align-items:center; justify-content:center;
+    font-size:30px;
+    box-shadow:0 10px 22px var(--shadow-soft);
+    border:3px solid #fff;
+  }
+
+  .hero h1{
+    font-family:'Fredoka', sans-serif;
+    font-weight:600;
+    font-size:26px;
+    letter-spacing:0.5px;
+    color:var(--rose-gold-dark);
+  }
+  .hero h1 span{ color:var(--pink-strong); }
+
+  .hero .tagline{
+    margin-top:6px;
+    font-size:13px;
+    color:var(--text-light);
+    font-weight:500;
+  }
+
+  /* ---------- CATEGORY CARD ---------- */
+  .category{
+    background:#fff;
+    border-radius:22px;
+    padding:16px 16px 6px;
+    margin-bottom:16px;
+    box-shadow:0 8px 24px var(--shadow-soft);
+    border:1px solid #FFEAEF;
+  }
+
+  .category h2{
+    font-family:'Fredoka', sans-serif;
+    font-weight:600;
+    font-size:16px;
+    color:var(--text-dark);
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-bottom:10px;
+  }
+  .category h2 .icon{
+    font-size:17px;
+    display:inline-flex;
+    width:30px; height:30px;
+    align-items:center; justify-content:center;
+    background:var(--blush-light);
+    border-radius:50%;
+  }
+
+  .note{
+    font-size:11.5px;
+    color:var(--text-light);
+    margin:-4px 0 10px;
+    font-style:italic;
+  }
+
+  /* ---------- ITEM ROWS ---------- */
+  .item-card{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    padding:12px 10px;
+    border-bottom:1px solid #FBE9EE;
+    transition:background .2s ease;
+    border-radius:12px;
+  }
+  .item-card:last-child{ border-bottom:none; }
+  .item-card.active{ background:var(--blush-light); }
+
+  .item-info{ display:flex; flex-direction:column; gap:2px; min-width:0; }
+  .item-name{ font-size:14px; font-weight:600; color:var(--text-dark); }
+  .item-price{ font-size:11.5px; color:var(--text-light); font-weight:500; }
+  .item-price small{ color:var(--rose-gold-dark); font-weight:600; }
+
+  /* toggle switch */
+  .switch{
+    position:relative;
+    width:46px; height:26px;
+    flex-shrink:0;
+    cursor:pointer;
+  }
+  .switch input{
+    opacity:0; width:0; height:0;
+  }
+  .switch .slider{
+    position:absolute; inset:0;
+    background:#F3D9E0;
+    border-radius:30px;
+    transition:.25s;
+  }
+  .switch .slider::before{
+    content:"";
+    position:absolute;
+    width:20px; height:20px;
+    left:3px; top:3px;
+    background:#fff;
+    border-radius:50%;
+    transition:.25s;
+    box-shadow:0 2px 5px rgba(0,0,0,0.15);
+  }
+  .switch input:checked + .slider{
+    background:linear-gradient(135deg, var(--pink-strong), var(--gold));
+  }
+  .switch input:checked + .slider::before{
+    transform:translateX(20px);
+  }
+
+  /* counter control */
+  .counter-control{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-shrink:0;
+  }
+  .ctr-btn{
+    width:30px; height:30px;
+    border-radius:50%;
+    border:none;
+    background:var(--blush-light);
+    color:var(--rose-gold-dark);
+    font-size:17px;
+    font-weight:700;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer;
+    transition:.15s;
+    line-height:1;
+    padding-bottom:2px;
+  }
+  .ctr-btn.plus{
+    background:linear-gradient(135deg, var(--pink-strong), var(--gold));
+    color:#fff;
+  }
+  .ctr-btn:active{ transform:scale(0.88); }
+  .ctr-btn:disabled{ opacity:0.35; cursor:not-allowed; }
+
+  .ctr-value{
+    min-width:20px;
+    text-align:center;
+    font-weight:700;
+    font-size:14px;
+    color:var(--text-dark);
+  }
+
+  /* ---------- STICKY TOTAL BAR ---------- */
+  .sticky-bar{
+    position:fixed;
+    left:0; right:0; bottom:0;
+    max-width:480px;
+    margin:0 auto;
+    background:#fff;
+    padding:14px 18px calc(14px + env(safe-area-inset-bottom));
+    box-shadow:0 -10px 30px rgba(199,138,153,0.25);
+    border-radius:26px 26px 0 0;
+    z-index:50;
+  }
+  .sticky-bar::before{
+    content:"";
+    position:absolute;
+    top:-9px; left:0; right:0;
+    height:10px;
+    background-image:radial-gradient(circle at 10px 10px, transparent 9px, #fff 10px);
+    background-size:20px 20px;
+    background-repeat:repeat-x;
+  }
+
+  .total-info{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    margin-bottom:10px;
+  }
+  .total-label{
+    font-size:13px;
+    font-weight:600;
+    color:var(--text-light);
+  }
+  .total-amount{
+    font-family:'Fredoka', sans-serif;
+    font-size:20px;
+    font-weight:600;
+    color:var(--rose-gold-dark);
+  }
+
+  .wa-btn{
+    width:100%;
+    padding:14px;
+    border:none;
+    border-radius:18px;
+    background:linear-gradient(135deg, #FF8FAE, #E3B583);
+    color:#fff;
+    font-family:'Fredoka', sans-serif;
+    font-weight:600;
+    font-size:15.5px;
+    letter-spacing:0.3px;
+    cursor:pointer;
+    box-shadow:0 8px 18px rgba(255,143,174,0.45);
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .wa-btn:active{
+    transform:scale(0.97);
+    box-shadow:0 4px 10px rgba(255,143,174,0.4);
+  }
+
+  /* ---------- TOAST ---------- */
+  .toast{
+    position:fixed;
+    bottom:128px;
+    left:50%;
+    transform:translateX(-50%) translateY(20px);
+    background:var(--text-dark);
+    color:#fff;
+    padding:10px 18px;
+    border-radius:14px;
+    font-size:13px;
+    font-weight:500;
+    opacity:0;
+    pointer-events:none;
+    transition:.3s ease;
+    z-index:100;
+    white-space:nowrap;
+    box-shadow:0 8px 20px rgba(0,0,0,0.2);
+  }
+  .toast.show{
+    opacity:1;
+    transform:translateX(-50%) translateY(0);
+  }
+
+  @media (min-width:480px){
+    .sticky-bar{ border-radius:26px 26px 0 0; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <div class="hero">
+    <div class="deco">
+      <span class="sparkle">✨</span>
+      <span class="sparkle">💕</span>
+      <span class="sparkle">⭐</span>
+    </div>
+    <div class="logo-badge">💅</div>
+    <h1>DIARY.<span>NAILS</span>.CHU</h1>
+    <p class="tagline">Kalkulator Harga &amp; Booking Online ✨</p>
+  </div>
+
+  <main>
+
+    <section class="category">
+      <h2><span class="icon">💖</span> Main Services</h2>
+      <div class="item-list" id="list-main"></div>
+    </section>
+
+    <section class="category">
+      <h2><span class="icon">🤚</span> Nails Tangan</h2>
+      <div class="item-list" id="list-tangan"></div>
+    </section>
+
+    <section class="category">
+      <h2><span class="icon">🦶</span> Nails Kaki</h2>
+      <div class="item-list" id="list-kaki"></div>
+    </section>
+
+    <section class="category">
+      <h2><span class="icon">💎</span> Add On (per Jari)</h2>
+      <div class="item-list" id="list-addon"></div>
+    </section>
+
+    <section class="category">
+      <h2><span class="icon">🎨</span> Add On Desain (per Jari)</h2>
+      <p class="note">*Harga final menyesuaikan tingkat kesulitan desain ya, kak 🥰</p>
+      <div class="item-list" id="list-addon-range"></div>
+    </section>
+
+  </main>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="sticky-bar">
+  <div class="total-info">
+    <span class="total-label">Total Estimasi</span>
+    <span class="total-amount" id="totalAmount">Rp 0</span>
+  </div>
+  <button class="wa-btn" id="waBtn">Book Via WhatsApp 💖</button>
+</div>
+
+<script>
+  const WA_NUMBER = "6283854705864";
+
+  const DATA = {
+    main: [
+      { id:"russian", name:"Russian Mains / Pieds", fullName:"Russian Mains / Pieds", price:40000, type:"toggle", unit:"Set" },
+      { id:"remove",  name:"Remove Nails",           fullName:"Remove Nails",          price:25000, type:"toggle", unit:"Set" },
+    ],
+    tangan: [
+      { id:"tangan_polos",   name:"Gel Polos",    fullName:"Gel Polos (Tangan)",    price:40000, type:"toggle", unit:"Set" },
+      { id:"tangan_glitter", name:"Gel Glitter",  fullName:"Gel Glitter (Tangan)",  price:45000, type:"toggle", unit:"Set" },
+      { id:"tangan_cateye",  name:"Gel Cat Eye",  fullName:"Gel Cat Eye (Tangan)",  price:50000, type:"toggle", unit:"Set" },
+    ],
+    kaki: [
+      { id:"kaki_polos",   name:"Gel Polos",   fullName:"Gel Polos (Kaki)",   price:45000, type:"toggle", unit:"Set" },
+      { id:"kaki_glitter", name:"Gel Glitter", fullName:"Gel Glitter (Kaki)", price:50000, type:"toggle", unit:"Set" },
+      { id:"kaki_cateye",  name:"Gel Cat Eye", fullName:"Gel Cat Eye (Kaki)", price:50000, type:"toggle", unit:"Set" },
+    ],
+    addon: [
+      { id:"softgel",    name:"Soft Gel Tip",  fullName:"Soft Gel Tip",  price:3000, type:"counter", unit:"Jari" },
+      { id:"ombre",      name:"Ombre",         fullName:"Ombre",         price:5000, type:"counter", unit:"Jari" },
+      { id:"marbel",     name:"Marbel",        fullName:"Marbel",        price:5000, type:"counter", unit:"Jari" },
+      { id:"foil",       name:"Nail Foil",     fullName:"Nail Foil",     price:3000, type:"counter", unit:"Jari" },
+      { id:"stamping",   name:"Stamping",      fullName:"Stamping",      price:4000, type:"counter", unit:"Jari" },
+      { id:"french",     name:"French Nail",   fullName:"French Nail",  price:4000, type:"counter", unit:"Jari" },
+      { id:"fullchrome", name:"Full Chrome",   fullName:"Full Chrome",   price:7000, type:"counter", unit:"Jari" },
+      { id:"chromes",    name:"Chromes Nail",  fullName:"Chromes Nail",  price:3000, type:"counter", unit:"Jari" },
+    ],
+    addonRange: [
+      { id:"stickers",  name:"Stickers",         fullName:"Stickers",         price:2000, type:"counter", unit:"Jari", rangeLabel:"2-10K / Jari" },
+      { id:"3ddesain",  name:"3D Desain",        fullName:"3D Desain",        price:3000, type:"counter", unit:"Jari", rangeLabel:"3-10K / Jari" },
+      { id:"charms",    name:"Charms (Acc)",     fullName:"Charms (Acc)",     price:3000, type:"counter", unit:"Jari", rangeLabel:"3-10K / Jari" },
+      { id:"painting",  name:"Painting Desain",  fullName:"Painting Desain",  price:5000, type:"counter", unit:"Jari", rangeLabel:"5-10K / Jari" },
+    ],
+  };
+
+  // flatten for quick lookup
+  const ALL_ITEMS = [
+    ...DATA.main, ...DATA.tangan, ...DATA.kaki, ...DATA.addon, ...DATA.addonRange
+  ];
+
+  const state = {};
+  ALL_ITEMS.forEach(item => { state[item.id] = 0; });
+
+  function formatRupiah(num){
+    return "Rp " + Math.round(num).toLocaleString("id-ID");
+  }
+
+  function renderToggle(item){
+    return `
+      <div class="item-card" data-id="${item.id}">
+        <div class="item-info">
+          <span class="item-name">${item.name}</span>
+          <span class="item-price">${formatRupiah(item.price)} / set</span>
+        </div>
+        <label class="switch">
+          <input type="checkbox" data-id="${item.id}" class="toggle-input">
+          <span class="slider"></span>
+        </label>
+      </div>
+    `;
+  }
+
+  function renderCounter(item){
+    const priceLabel = item.rangeLabel
+      ? `${formatRupiah(item.price)} / jari <small>(${item.rangeLabel})</small>`
+      : `${formatRupiah(item.price)} / jari`;
+    return `
+      <div class="item-card" data-id="${item.id}">
+        <div class="item-info">
+          <span class="item-name">${item.name}</span>
+          <span class="item-price">${priceLabel}</span>
+        </div>
+        <div class="counter-control">
+          <button class="ctr-btn minus" data-id="${item.id}" type="button">−</button>
+          <span class="ctr-value" id="qty-${item.id}">0</span>
+          <button class="ctr-btn plus" data-id="${item.id}" type="button">+</button>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderCategory(containerId, items){
+    const el = document.getElementById(containerId);
+    el.innerHTML = items.map(item =>
+      item.type === "toggle" ? renderToggle(item) : renderCounter(item)
+    ).join("");
+  }
+
+  renderCategory("list-main", DATA.main);
+  renderCategory("list-tangan", DATA.tangan);
+  renderCategory("list-kaki", DATA.kaki);
+  renderCategory("list-addon", DATA.addon);
+  renderCategory("list-addon-range", DATA.addonRange);
+
+  function getItemById(id){
+    return ALL_ITEMS.find(i => i.id === id);
+  }
+
+  function updateTotal(){
+    let total = 0;
+    ALL_ITEMS.forEach(item => {
+      total += state[item.id] * item.price;
+    });
+    document.getElementById("totalAmount").textContent = formatRupiah(total);
+  }
+
+  function setCardActive(id, isActive){
+    const card = document.querySelector(`.item-card[data-id="${id}"]`);
+    if(card){
+      card.classList.toggle("active", isActive);
+    }
+  }
+
+  // toggle listeners
+  document.querySelectorAll(".toggle-input").forEach(input => {
+    input.addEventListener("change", () => {
+      const id = input.dataset.id;
+      state[id] = input.checked ? 1 : 0;
+      setCardActive(id, input.checked);
+      updateTotal();
+    });
+  });
+
+  // counter listeners
+  document.querySelectorAll(".ctr-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const id = btn.dataset.id;
+      const isPlus = btn.classList.contains("plus");
+      let qty = state[id];
+      qty = isPlus ? Math.min(10, qty + 1) : Math.max(0, qty - 1);
+      state[id] = qty;
+      document.getElementById(`qty-${id}`).textContent = qty;
+      setCardActive(id, qty > 0);
+      refreshCounterButtons(id);
+      updateTotal();
+    });
+  });
+
+  function refreshCounterButtons(id){
+    const qty = state[id];
+    const card = document.querySelector(`.item-card[data-id="${id}"]`);
+    if(!card) return;
+    const minusBtn = card.querySelector(".minus");
+    const plusBtn = card.querySelector(".plus");
+    if(minusBtn) minusBtn.disabled = qty <= 0;
+    if(plusBtn) plusBtn.disabled = qty >= 10;
+  }
+
+  ALL_ITEMS.filter(i => i.type === "counter").forEach(i => refreshCounterButtons(i.id));
+
+  function showToast(message){
+    const toast = document.getElementById("toast");
+    toast.textContent = message;
+    toast.classList.add("show");
+    setTimeout(() => toast.classList.remove("show"), 2400);
+  }
+
+  document.getElementById("waBtn").addEventListener("click", () => {
+    const lines = [];
+    let total = 0;
+
+    ALL_ITEMS.forEach(item => {
+      const qty = state[item.id];
+      if(qty > 0){
+        lines.push(`- ${item.fullName}: ${qty} ${item.unit}`);
+        total += qty * item.price;
+      }
+    });
+
+    if(lines.length === 0){
+      showToast("Yuk pilih menu favoritmu dulu ya, kak ✨");
+      return;
+    }
+
+    const message =
+      `Halo Kak Admin Diary Nails Chu! 💕\n` +
+      `Ini estimasi Bookingan saya:\n` +
+      `${lines.join("\n")}\n\n` +
+      `Estimasi Total: ${formatRupiah(total)}\n` +
+      `Apakah ada slot kosong untuk saya? 🥰`;
+
+    const url = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(message)}`;
+    window.open(url, "_blank");
+  });
+
+  updateTotal();
+</script>
+
+</body>
+</html>
