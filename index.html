@@ -471,7 +471,13 @@
     font-size:18px;
     text-align:center;
     color:var(--rose-gold-dark);
-    margin-bottom:14px;
+    margin-bottom:2px;
+  }
+  .reviews-hint{
+    text-align:center;
+    font-size:11px;
+    color:var(--text-light);
+    margin-bottom:12px;
   }
 
   .reviews-scroll{
@@ -496,13 +502,44 @@
     display:flex;
     flex-direction:column;
     gap:8px;
+    cursor:pointer;
+    transition:transform .18s ease, box-shadow .18s ease;
+  }
+  .review-card:hover,
+  .review-card:focus-visible{
+    transform:translateY(-3px);
+    box-shadow:0 14px 30px rgba(199,138,153,0.28);
+  }
+  .review-card:focus-visible{
+    outline:2px solid var(--pink-strong);
+    outline-offset:2px;
+  }
+  .review-photo-wrap{
+    position:relative;
+    border-radius:12px;
+    overflow:hidden;
   }
   .review-photo{
     width:100%;
     height:120px;
     object-fit:cover;
-    border-radius:12px;
     display:block;
+  }
+  .review-photo-wrap::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:linear-gradient(180deg, rgba(0,0,0,0) 55%, rgba(74,40,50,0.45) 100%);
+  }
+  .review-zoom-label{
+    position:absolute;
+    bottom:6px;
+    right:9px;
+    color:#fff;
+    font-size:10.5px;
+    font-weight:600;
+    letter-spacing:0.2px;
+    z-index:2;
   }
   .review-stars{
     font-size:13px;
@@ -525,6 +562,109 @@
 
   @media (min-width:480px){
     .review-card{ flex:0 0 58%; }
+  }
+
+  /* ---------- REVIEW CATALOG / LIGHTBOX ---------- */
+  .catalog-modal{
+    background:#fff;
+    border-radius:22px;
+    width:100%;
+    max-width:340px;
+    max-height:90vh;
+    overflow-y:auto;
+    position:relative;
+    transform:translateY(14px) scale(0.96);
+    transition:transform .25s ease;
+    box-shadow:0 20px 50px rgba(0,0,0,0.25);
+  }
+  .modal-overlay.show .catalog-modal{
+    transform:translateY(0) scale(1);
+  }
+  .catalog-close{
+    position:absolute;
+    top:10px; right:10px;
+    width:32px; height:32px;
+    border-radius:50%;
+    border:none;
+    background:rgba(255,255,255,0.92);
+    color:var(--text-dark);
+    font-size:17px;
+    font-weight:700;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer;
+    z-index:5;
+    box-shadow:0 4px 10px rgba(0,0,0,0.15);
+  }
+  .catalog-photo-wrap{
+    position:relative;
+    width:100%;
+    aspect-ratio:4 / 3;
+    background:var(--blush-light);
+    overflow:hidden;
+  }
+  .catalog-photo-wrap img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+  }
+  .catalog-nav{
+    position:absolute;
+    top:50%;
+    transform:translateY(-50%);
+    width:34px; height:34px;
+    border-radius:50%;
+    border:none;
+    background:rgba(255,255,255,0.88);
+    color:var(--rose-gold-dark);
+    font-size:18px;
+    font-weight:700;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer;
+    box-shadow:0 4px 10px rgba(0,0,0,0.15);
+  }
+  .catalog-nav.prev{ left:10px; }
+  .catalog-nav.next{ right:10px; }
+  .catalog-body{ padding:16px 18px 18px; }
+  .catalog-stars{
+    font-size:14px;
+    letter-spacing:1px;
+    color:#F0A23A;
+    margin-bottom:8px;
+  }
+  .catalog-text{
+    font-size:13px;
+    color:var(--text-dark);
+    font-style:italic;
+    line-height:1.55;
+    margin-bottom:8px;
+  }
+  .catalog-name{
+    font-size:12.5px;
+    font-weight:700;
+    color:var(--rose-gold-dark);
+  }
+  .catalog-thumbs{
+    display:flex;
+    gap:8px;
+    padding:0 18px 18px;
+  }
+  .catalog-thumb{
+    width:48px; height:48px;
+    border-radius:10px;
+    overflow:hidden;
+    border:2px solid transparent;
+    cursor:pointer;
+    flex-shrink:0;
+    opacity:0.65;
+    transition:opacity .15s ease, border-color .15s ease;
+    padding:0;
+    background:none;
+  }
+  .catalog-thumb img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .catalog-thumb.active{
+    border-color:var(--pink-strong);
+    opacity:1;
   }
 
   /* ---------- FOOTER ---------- */
@@ -584,6 +724,7 @@
 
     <section class="reviews-section">
       <h2 class="reviews-title">Ulasan Pelanggan ✨</h2>
+      <p class="reviews-hint">Tap foto buat lihat katalog hasilnya 💕</p>
       <div class="reviews-scroll" id="reviewsList"></div>
     </section>
 
@@ -632,6 +773,23 @@
     <p class="bill-footer-note">Terima kasih sudah mampir, kak! 💕<br> ini bisa berubah menyesuaikan kondisi di tempat.</p>
 
     <button class="close-bill-btn" id="closeBillBtn" type="button">Tutup Bill</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="catalogOverlay">
+  <div class="catalog-modal">
+    <button class="catalog-close" id="catalogCloseBtn" type="button" aria-label="Tutup katalog">×</button>
+    <div class="catalog-photo-wrap">
+      <img id="catalogImage" src="" alt="Hasil nail art">
+      <button class="catalog-nav prev" id="catalogPrevBtn" type="button" aria-label="Foto sebelumnya">‹</button>
+      <button class="catalog-nav next" id="catalogNextBtn" type="button" aria-label="Foto berikutnya">›</button>
+    </div>
+    <div class="catalog-body">
+      <div class="catalog-stars" id="catalogStars"></div>
+      <p class="catalog-text" id="catalogText"></p>
+      <span class="catalog-name" id="catalogName"></span>
+    </div>
+    <div class="catalog-thumbs" id="catalogThumbs"></div>
   </div>
 </div>
 
@@ -757,16 +915,79 @@
 
   function renderReviews(){
     const el = document.getElementById("reviewsList");
-    el.innerHTML = REVIEWS.map(r => `
-      <div class="review-card">
-        <img src="${r.image}" alt="Hasil nail art ${r.name}" class="review-photo" loading="lazy">
+    el.innerHTML = REVIEWS.map((r, i) => `
+      <div class="review-card" data-index="${i}" tabindex="0" role="button" aria-label="Lihat katalog foto ${r.name}">
+        <div class="review-photo-wrap">
+          <img src="${r.image}" alt="Hasil nail art ${r.name}" class="review-photo" loading="lazy">
+          <span class="review-zoom-label">Lihat katalog →</span>
+        </div>
         <div class="review-stars">${renderStars(r.stars)}</div>
         <p class="review-text">"${r.text}"</p>
         <span class="review-name">${r.name}</span>
       </div>
     `).join("");
+
+    el.querySelectorAll(".review-card").forEach(card => {
+      card.addEventListener("click", () => openCatalog(Number(card.dataset.index)));
+      card.addEventListener("keydown", (e) => {
+        if(e.key === "Enter" || e.key === " "){
+          e.preventDefault();
+          openCatalog(Number(card.dataset.index));
+        }
+      });
+    });
   }
   renderReviews();
+
+  // ---------- REVIEW CATALOG / LIGHTBOX ----------
+  let catalogIndex = 0;
+
+  function renderCatalogThumbs(){
+    const thumbsEl = document.getElementById("catalogThumbs");
+    thumbsEl.innerHTML = REVIEWS.map((r, i) => `
+      <button class="catalog-thumb${i === catalogIndex ? " active" : ""}" data-index="${i}" type="button" aria-label="Lihat foto ${r.name}">
+        <img src="${r.image}" alt="">
+      </button>
+    `).join("");
+    thumbsEl.querySelectorAll(".catalog-thumb").forEach(thumb => {
+      thumb.addEventListener("click", () => setCatalogIndex(Number(thumb.dataset.index)));
+    });
+  }
+
+  function setCatalogIndex(i){
+    catalogIndex = (i + REVIEWS.length) % REVIEWS.length;
+    const r = REVIEWS[catalogIndex];
+    document.getElementById("catalogImage").src = r.image;
+    document.getElementById("catalogImage").alt = `Hasil nail art ${r.name}`;
+    document.getElementById("catalogStars").textContent = renderStars(r.stars);
+    document.getElementById("catalogText").textContent = `"${r.text}"`;
+    document.getElementById("catalogName").textContent = r.name;
+    renderCatalogThumbs();
+  }
+
+  function openCatalog(i){
+    setCatalogIndex(i);
+    document.getElementById("catalogOverlay").classList.add("show");
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeCatalog(){
+    document.getElementById("catalogOverlay").classList.remove("show");
+    document.body.style.overflow = "";
+  }
+
+  document.getElementById("catalogCloseBtn").addEventListener("click", closeCatalog);
+  document.getElementById("catalogPrevBtn").addEventListener("click", () => setCatalogIndex(catalogIndex - 1));
+  document.getElementById("catalogNextBtn").addEventListener("click", () => setCatalogIndex(catalogIndex + 1));
+  document.getElementById("catalogOverlay").addEventListener("click", (e) => {
+    if(e.target.id === "catalogOverlay") closeCatalog();
+  });
+  document.addEventListener("keydown", (e) => {
+    if(!document.getElementById("catalogOverlay").classList.contains("show")) return;
+    if(e.key === "Escape") closeCatalog();
+    if(e.key === "ArrowLeft") setCatalogIndex(catalogIndex - 1);
+    if(e.key === "ArrowRight") setCatalogIndex(catalogIndex + 1);
+  });
 
   function getItemById(id){
     return ALL_ITEMS.find(i => i.id === id);
