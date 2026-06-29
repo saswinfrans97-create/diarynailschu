@@ -795,10 +795,11 @@
 
 <script>
   const WA_NUMBER = "6283854705864";
+  const MAX_QTY = 20;
 
   const DATA = {
     main: [
-      { id:"russian", name:"Russian Mains / Pieds", fullName:"Russian Mains / Pieds", price:25000, type:"toggle", unit:"Set" },
+      { id:"russian", name:"Russian Mains / Pieds", fullName:"Russian Mains / Pieds", price:40000, type:"toggle", unit:"Set" },
       { id:"remove",  name:"Remove Nails",           fullName:"Remove Nails",          price:25000, type:"toggle", unit:"Set" },
     ],
     tangan: [
@@ -1025,7 +1026,7 @@
       const id = btn.dataset.id;
       const isPlus = btn.classList.contains("plus");
       let qty = state[id];
-      qty = isPlus ? Math.min(10, qty + 1) : Math.max(0, qty - 1);
+      qty = isPlus ? Math.min(MAX_QTY, qty + 1) : Math.max(0, qty - 1);
       state[id] = qty;
       document.getElementById(`qty-${id}`).textContent = qty;
       setCardActive(id, qty > 0);
@@ -1041,7 +1042,7 @@
     const minusBtn = card.querySelector(".minus");
     const plusBtn = card.querySelector(".plus");
     if(minusBtn) minusBtn.disabled = qty <= 0;
-    if(plusBtn) plusBtn.disabled = qty >= 10;
+    if(plusBtn) plusBtn.disabled = qty >= MAX_QTY;
   }
 
   ALL_ITEMS.filter(i => i.type === "counter").forEach(i => refreshCounterButtons(i.id));
